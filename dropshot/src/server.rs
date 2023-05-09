@@ -665,7 +665,7 @@ async fn http_request_handle_wrap<C: ServerContext, Tr: Tracing>(
     server: Arc<DropshotState<C>>,
     remote_addr: SocketAddr,
     request: Request<Body>,
-    tracing: Tr,
+    mut tracing: Tr,
 ) -> Result<Response<Body>, GenericError> {
     // This extra level of indirection makes error handling much more
     // straightforward, since the request handling code can simply return early

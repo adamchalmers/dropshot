@@ -4,7 +4,7 @@ pub trait Tracing: std::fmt::Debug + Clone + Send + Sync + 'static {
     type Registration: Unpin;
 
     fn register(&self) -> Self::Registration;
-    fn request_start(&self, request_info: &RequestInfo);
+    fn request_start(&mut self, request_info: &RequestInfo);
     fn request_done(&self, response_info: &ResponseInfo);
 }
 
@@ -23,7 +23,7 @@ impl Tracing for Dtrace {
         }
     }
 
-    fn request_start(&self, request_info: &RequestInfo) {
+    fn request_start(&mut self, request_info: &RequestInfo) {
         crate::dtrace::probes::request__start!(|| request_info);
     }
 
@@ -42,7 +42,7 @@ impl Tracing for Noop {
         ()
     }
 
-    fn request_start(&self, _: &RequestInfo) {}
+    fn request_start(&mut self, _: &RequestInfo) {}
 
     fn request_done(&self, _: &ResponseInfo) {}
 }
