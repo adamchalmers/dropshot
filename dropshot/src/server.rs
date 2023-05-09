@@ -688,6 +688,7 @@ async fn http_request_handle_wrap<C: ServerContext, Tr: Tracing>(
             method: request.method().to_string(),
             path: uri.path().to_string(),
             query: uri.query().map(|x| x.to_string()),
+            headers: request.headers().clone(),
         })
         .await;
 

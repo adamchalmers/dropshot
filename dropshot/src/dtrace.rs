@@ -9,6 +9,8 @@ pub struct RequestInfo {
     pub method: String,
     pub path: String,
     pub query: Option<String>,
+    #[serde(skip)]
+    pub headers: http::HeaderMap<http::HeaderValue>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
