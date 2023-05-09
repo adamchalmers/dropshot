@@ -5,6 +5,7 @@ use http::uri::Uri;
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct RequestInfo {
+    /// Request ID
     pub id: String,
     pub local_addr: std::net::SocketAddr,
     pub remote_addr: std::net::SocketAddr,
@@ -19,6 +20,7 @@ pub struct RequestInfo {
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ResponseInfo {
+    /// Request ID
     pub id: String,
     pub local_addr: std::net::SocketAddr,
     pub remote_addr: std::net::SocketAddr,
