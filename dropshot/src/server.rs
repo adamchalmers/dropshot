@@ -680,14 +680,16 @@ async fn http_request_handle_wrap<C: ServerContext, Tr: Tracing>(
     ));
     trace!(request_log, "incoming request");
     let uri = request.uri();
-    tracing.request_start(&crate::dtrace::RequestInfo {
-        id: request_id.clone(),
-        local_addr: server.local_addr,
-        remote_addr,
-        method: request.method().to_string(),
-        path: uri.path().to_string(),
-        query: uri.query().map(|x| x.to_string()),
-    });
+    tracing
+        .request_start(&crate::dtrace::RequestInfo {
+            id: request_id.clone(),
+            local_addr: server.local_addr,
+            remote_addr,
+            method: request.method().to_string(),
+            path: uri.path().to_string(),
+            query: uri.query().map(|x| x.to_string()),
+        })
+        .await;
 
     // Copy local address to report later during the finish probe, as the
     // server is passed by value to the request handler function.
@@ -708,13 +710,15 @@ async fn http_request_handle_wrap<C: ServerContext, Tr: Tracing>(
             let message_internal = error.internal_message.clone();
             let r = error.into_response(&request_id);
 
-            tracing.request_done(&crate::dtrace::ResponseInfo {
-                id: request_id.clone(),
-                local_addr,
-                remote_addr,
-                status_code: r.status().as_u16(),
-                message: message_external.clone(),
-            });
+            tracing
+                .request_done(&crate::dtrace::ResponseInfo {
+                    id: request_id.clone(),
+                    local_addr,
+                    remote_addr,
+                    status_code: r.status().as_u16(),
+                    message: message_external.clone(),
+                })
+                .await;
 
             // TODO-debug: add request and response headers here
             info!(request_log, "request completed";
@@ -732,13 +736,15 @@ async fn http_request_handle_wrap<C: ServerContext, Tr: Tracing>(
                 "response_code" => response.status().as_str().to_string()
             );
 
-            tracing.request_done(&crate::dtrace::ResponseInfo {
-                id: request_id.parse().unwrap(),
-                local_addr,
-                remote_addr,
-                status_code: response.status().as_u16(),
-                message: "".to_string(),
-            });
+            tracing
+                .request_done(&crate::dtrace::ResponseInfo {
+                    id: request_id.parse().unwrap(),
+                    local_addr,
+                    remote_addr,
+                    status_code: response.status().as_u16(),
+                    message: "".to_string(),
+                })
+                .await;
 
             response
         }
