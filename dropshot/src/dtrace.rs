@@ -1,6 +1,8 @@
 // Copyright 2023 Oxide Computer Company
 //! DTrace probes and support
 
+use http::uri::Uri;
+
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct RequestInfo {
     pub id: String,
@@ -11,6 +13,8 @@ pub struct RequestInfo {
     pub query: Option<String>,
     #[serde(skip)]
     pub headers: http::HeaderMap<http::HeaderValue>,
+    #[serde(serialize_with = "serialize_uri")]
+    pub uri: Uri,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -41,4 +45,11 @@ pub enum ProbeRegistration {
 
     /// Registration failed, with an error message explaining the cause.
     Failed(String),
+}
+
+fn serialize_uri<S>(uri: &Uri, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    s.serialize_str(&uri.to_string())
 }
